@@ -1,2 +1,2 @@
-# Implementation-of-a-CNN-Inference-Accelerator-in-an-FPGA (In progress)
+# Implementation-of-a-CNN-Inference-Accelerator-in-an-FPGA (In Progress)
 This design takes in 16x16 grayscale images and processes them to determine them as a 0 or a 1. It uses basic MAC units to accelerate the process along with Fixed point Q9.7 arithmatic system. The CNN weights were obtained by using python libraries and the MNIST dataset (only the images of "1" and  "0", resized from 28x28 to 16x16 for this purpose)
