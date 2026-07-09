@@ -1,0 +1,19 @@
+CNN Parameter Summary
+==================================================
+
+Convolution
+-------------------------
+Filters       : 2
+Kernel Size   : 3
+
+Dense Layer
+-------------------------
+Inputs        : 98
+Outputs       : 3
+
+Fixed Point
+-------------------------
+Weight Format : Q3.8
+Bias Format   : Q3.8
+Conv Bits     : 24
+Neuron Bits   : 44

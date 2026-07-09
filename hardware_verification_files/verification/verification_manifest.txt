@@ -1,0 +1,30 @@
+Hardware Verification Package
+============================================================
+
+Dataset Index : 0
+Ground Truth  : 2
+Prediction    : 2
+
+Network Configuration
+------------------------------
+Image Size      : 16
+Conv Size       : 14
+Pool Size       : 7
+Flatten Length  : 98
+Classes         : 3
+
+Fixed Point Formats
+------------------------------
+Pixel Bits      : 8
+Weight Bits     : 12
+Weight Fraction : 8
+Bias Bits       : 12
+Bias Fraction   : 8
+Conv Bits       : 24
+Neuron Bits     : 44
+
+Neuron Outputs
+------------------------------
+Neuron  0 : -43525942
+Neuron  1 : -282114744
+Neuron  2 : 128611600
