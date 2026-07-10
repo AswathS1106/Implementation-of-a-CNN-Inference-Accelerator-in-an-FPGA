@@ -32,7 +32,9 @@ always @(posedge clk) begin
 end
 endmodule
 
-module mac_int (
+module mac_int #(parameter WT_FILE_NAME = "default_file.mem",
+BIAS_FILE_NAME = "default_file.mem"
+) (
     output reg signed [23:0] conv_sum,//Sum goes to Relu
     output reg next_win_req,//Signal to Win. Gen. for new window. Current window consumed
     output reg wr_valid,//Signal saying valid data sent to feature matrix memory
@@ -40,12 +42,15 @@ module mac_int (
     input clk,
     input rst,
 
-    input wire signed [12-1:0] bias,
-    input wire [12*9-1:0] weights,//Follows Q3.8 fixed point signed arithmatic
+    //input wire signed [12-1:0] bias,
+    //input wire [12*9-1:0] weights,//Follows Q3.8 fixed point signed arithmatic
     input [8*9-1:0] pixel_win,//pixel window from the win. gen.
     input win_valid//signal saying window is valid and can be used
 );
 
+
+    reg signed [12-1:0] weights [0:8];
+    reg signed [12-1:0] bias [0:0];
 
     wire signed [23:0] mac0_sum;
     reg [7:0] mac0_pixel;
@@ -91,6 +96,8 @@ module mac_int (
         next_state = 'd0;
         clear = 'd0;
 
+        $readmemb(WT_FILE_NAME, weights);
+        $readmemb(BIAS_FILE_NAME, bias);
     end
 
     always @(*) begin //Pixel/Weight Mux
@@ -98,37 +105,37 @@ module mac_int (
         LOAD0:
         begin
             mac0_pixel  = pixel_win[0*8+:8];
-            mac0_weight = $signed(weights[0*12+:12]);
+            mac0_weight = $signed(weights[0]);
 
             mac1_pixel  = pixel_win[3*8+:8];
-            mac1_weight = $signed(weights[3*12+:12]);
+            mac1_weight = $signed(weights[3]);
 
             mac2_pixel  = pixel_win[6*8+:8];
-            mac2_weight = $signed(weights[6*12+:12]);
+            mac2_weight = $signed(weights[6]);
         end
 
         LOAD1:
         begin
             mac0_pixel  = pixel_win[1*8+:8];
-            mac0_weight = $signed(weights[1*12+:12]);
+            mac0_weight = $signed(weights[1]);
 
             mac1_pixel  = pixel_win[4*8+:8];
-            mac1_weight = $signed(weights[4*12+:12]);
+            mac1_weight = $signed(weights[4]);
 
             mac2_pixel  = pixel_win[7*8+:8];
-            mac2_weight = $signed(weights[7*12+:12]);
+            mac2_weight = $signed(weights[7]);
         end
 
         LOAD2:
         begin
             mac0_pixel  = pixel_win[2*8+:8];
-            mac0_weight = $signed(weights[2*12+:12]);
+            mac0_weight = $signed(weights[2]);
 
             mac1_pixel  = pixel_win[5*8+:8];
-            mac1_weight = $signed(weights[5*12+:12]);
+            mac1_weight = $signed(weights[5]);
 
             mac2_pixel  = pixel_win[8*8+:8];
-            mac2_weight = $signed(weights[8*12+:12]);
+            mac2_weight = $signed(weights[8]);
         end
 
         default:
@@ -189,7 +196,7 @@ module mac_int (
 
     always @(posedge clk) begin
         if(rst) conv_sum <= 'd0;
-        else if (state == SUM) conv_sum <= mac0_sum + mac1_sum + mac2_sum + bias;
+        else if (state == SUM) conv_sum <= mac0_sum + mac1_sum + mac2_sum + bias[0];
     end
 
     always @(*) begin //Control signal controller

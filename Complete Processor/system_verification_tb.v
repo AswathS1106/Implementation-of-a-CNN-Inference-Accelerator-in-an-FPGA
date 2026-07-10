@@ -3,7 +3,7 @@
 `include "line_buffer.v"
 `include "pixel_rdr.v"
 `include "image_memory.v"
-`include "weight_memory.v"
+//`include "weight_memory.v"
 `include "mac3.v"
 `include "ReLU_func.v"
 `include "feature_mat_mem.v"
@@ -101,9 +101,10 @@ window_gen tb_win_gen (.clk(clk), .rst(rst), .row_a_reg(row_a_reg), .row_b_reg(r
                         .rows_rdy(rows_rdy), .next_win_req(next_win_req),
                         .window(window), .win_set_done(win_set_done), .win_valid(win_valid));
                         
-weight_memory #(.WT_FILE_NAME("weights_c0.mem"), .BIAS_FILE_NAME("bias_c0.mem")) tb_weight_memory_0 (.bias(bias0), .weights(weights0));
+//weight_memory #(.WT_FILE_NAME("weights_c0.mem"), .BIAS_FILE_NAME("bias_c0.mem")) tb_weight_memory_0 (.bias(bias0), .weights(weights0));
 
-mac_int tb_mac_0 (.clk(clk), .rst(rst), .bias(bias0), .weights(weights0), .pixel_win(window), .win_valid(win_valid),
+mac_int #(.WT_FILE_NAME("weights_c0.mem"), .BIAS_FILE_NAME("bias_c0.mem")) tb_mac_0 (.clk(clk), .rst(rst), 
+                    .pixel_win(window), .win_valid(win_valid),
                     .conv_sum(conv_sum0), .next_win_req(next_win_req), .wr_valid(wr_valid_0));
 ReLU_func tb_ReLU_0 (.in(conv_sum0), .out(final_sum0));
 
@@ -119,9 +120,10 @@ proc_img_mem tb_proc_img_mem_0 (.clk(clk), .rst(rst),
                                 .rd_data(proc_img_rd_data0), .mem_full(proc_img_mem_full0), 
                                 .nxt_rd_req(nxt_rd_req_gated0));
 
-weight_memory #(.WT_FILE_NAME("weights_c1.mem"), .BIAS_FILE_NAME("bias_c1.mem")) tb_weight_memory_1 (.bias(bias1), .weights(weights1));
+//weight_memory #(.WT_FILE_NAME("weights_c1.mem"), .BIAS_FILE_NAME("bias_c1.mem")) tb_weight_memory_1 (.bias(bias1), .weights(weights1));
 
-mac_int tb_mac_1 (.clk(clk), .rst(rst), .bias(bias1), .weights(weights1), .pixel_win(window), .win_valid(win_valid),
+mac_int #(.WT_FILE_NAME("weights_c1.mem"), .BIAS_FILE_NAME("bias_c1.mem")) tb_mac_1 (.clk(clk), .rst(rst),
+                    .pixel_win(window), .win_valid(win_valid),
                     .conv_sum(conv_sum1), .next_win_req(next_win_req), .wr_valid(wr_valid_1));
 ReLU_func tb_ReLU_1 (.in(conv_sum1), .out(final_sum1));
 
