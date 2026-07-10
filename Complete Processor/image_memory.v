@@ -9,7 +9,7 @@ module image_memory #( parameter FILE_NAME = "image_file.mem") (
 
 reg [7:0] image_memory [0:16*16-1];
 
-integer i;
+//integer i;
 
 initial begin    
     $readmemb(FILE_NAME, image_memory);//Can include file location instead of "image file.mem"

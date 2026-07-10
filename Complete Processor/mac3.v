@@ -46,7 +46,6 @@ module mac_int (
     input win_valid//signal saying window is valid and can be used
 );
 
-    integer i;
 
     wire signed [23:0] mac0_sum;
     reg [7:0] mac0_pixel;
@@ -223,6 +222,8 @@ module mac_int (
             wr_valid = 'd1;
             next_win_req = 'd1;
         end
+
+        default:; //does nothing
 
         endcase
     end

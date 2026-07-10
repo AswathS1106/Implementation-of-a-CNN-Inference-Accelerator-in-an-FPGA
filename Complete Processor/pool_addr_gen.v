@@ -80,6 +80,8 @@ always @(posedge clk) begin
             end
             else pool_col <= pool_col + 2;
         end
+
+        default:; //do nothing
         endcase
     end
 end

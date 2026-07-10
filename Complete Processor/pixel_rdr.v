@@ -32,26 +32,8 @@ always @(posedge clk) begin
         pixel_out <= pixel_in;
         
         // Address only increments when an active request is made
-        if(pixel_req) begin
-            rd_addr <= rd_addr + 1;
-        end
+        if(pixel_req) rd_addr <= rd_addr + 1;
     end
 end
-/*
-always @(posedge clk) begin
-    if (rst || rd_addr == 8'd255) begin
-        rd_addr <= 'd0;
-        pixel_valid <= 'd0;
-        pixel_out <= 'd0;
-    end
 
-    else if (pixel_req) begin 
-        pixel_out <= pixel_in;
-        pixel_valid <= 'd1;
-        rd_addr <= rd_addr + 1;
-    end
-
-    else pixel_valid <= 'd0;
-end
-*/
 endmodule

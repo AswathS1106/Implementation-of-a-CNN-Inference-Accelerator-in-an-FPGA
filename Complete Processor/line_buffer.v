@@ -175,6 +175,8 @@ always @(posedge clk) begin
 
                 if (row_cnt == 15) img_done <= 'd1;
             end
+
+            default:; //do nothing
             endcase
         end
     end
