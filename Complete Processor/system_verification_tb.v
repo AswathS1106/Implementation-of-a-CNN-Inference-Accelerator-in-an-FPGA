@@ -3,7 +3,6 @@
 `include "line_buffer.v"
 `include "pixel_rdr.v"
 `include "image_memory.v"
-//`include "weight_memory.v"
 `include "mac3.v"
 `include "ReLU_func.v"
 `include "feature_mat_mem.v"
@@ -90,7 +89,7 @@ wire nxt_rd_req_gated1;
 assign nxt_rd_req_gated0 = nxt_rd_req && (tb_neuron_0.req_cnt <= 49);
 assign nxt_rd_req_gated1 = nxt_rd_req && (tb_neuron_0.req_cnt > 49);
 
-image_memory #(.FILE_NAME("image.mem")) tb_mem (.clk(clk), .rst(rst), .rd_addr(img_rd_addr), .pixel_out(pixel_in));
+image_memory #(.FILE_NAME("../Complete Processor/mem_files/image.mem")) tb_mem (.clk(clk), .rst(rst), .rd_addr(img_rd_addr), .pixel_out(pixel_in));
 pixel_rdr tb_rdr (.pixel_out(row_in_stream), .pixel_valid(pixel_valid), .rd_addr(img_rd_addr), .clk(clk), .rst(rst),
                     .pixel_in(pixel_in), .pixel_req(pixel_req));
 line_buffer tb_lb (.clk(clk), .rst(rst), .lb_st(lb_st), .row_in_stream(row_in_stream),
@@ -101,9 +100,7 @@ window_gen tb_win_gen (.clk(clk), .rst(rst), .row_a_reg(row_a_reg), .row_b_reg(r
                         .rows_rdy(rows_rdy), .next_win_req(next_win_req),
                         .window(window), .win_set_done(win_set_done), .win_valid(win_valid));
                         
-//weight_memory #(.WT_FILE_NAME("weights_c0.mem"), .BIAS_FILE_NAME("bias_c0.mem")) tb_weight_memory_0 (.bias(bias0), .weights(weights0));
-
-mac_int #(.WT_FILE_NAME("weights_c0.mem"), .BIAS_FILE_NAME("bias_c0.mem")) tb_mac_0 (.clk(clk), .rst(rst), 
+mac_int #(.WT_FILE_NAME("../Complete Processor/mem_files/weights_c0.mem"), .BIAS_FILE_NAME("../Complete Processor/mem_files/bias_c0.mem")) tb_mac_0 (.clk(clk), .rst(rst), 
                     .pixel_win(window), .win_valid(win_valid),
                     .conv_sum(conv_sum0), .next_win_req(next_win_req), .wr_valid(wr_valid_0));
 ReLU_func tb_ReLU_0 (.in(conv_sum0), .out(final_sum0));
@@ -120,9 +117,8 @@ proc_img_mem tb_proc_img_mem_0 (.clk(clk), .rst(rst),
                                 .rd_data(proc_img_rd_data0), .mem_full(proc_img_mem_full0), 
                                 .nxt_rd_req(nxt_rd_req_gated0));
 
-//weight_memory #(.WT_FILE_NAME("weights_c1.mem"), .BIAS_FILE_NAME("bias_c1.mem")) tb_weight_memory_1 (.bias(bias1), .weights(weights1));
 
-mac_int #(.WT_FILE_NAME("weights_c1.mem"), .BIAS_FILE_NAME("bias_c1.mem")) tb_mac_1 (.clk(clk), .rst(rst),
+mac_int #(.WT_FILE_NAME("../Complete Processor/mem_files/weights_c1.mem"), .BIAS_FILE_NAME("../Complete Processor/mem_files/bias_c1.mem")) tb_mac_1 (.clk(clk), .rst(rst),
                     .pixel_win(window), .win_valid(win_valid),
                     .conv_sum(conv_sum1), .next_win_req(next_win_req), .wr_valid(wr_valid_1));
 ReLU_func tb_ReLU_1 (.in(conv_sum1), .out(final_sum1));
@@ -153,15 +149,15 @@ reg signed [43:0] exp_neu2 [0:0];
 wire [23:0] neuron_input_mux;
 assign neuron_input_mux = (tb_neuron_0.wt_addr < 49) ? proc_img_rd_data0 : proc_img_rd_data1;
 
-neuron #(.WT_FILE_NAME("weights_n0.mem"), .BIAS_FILE_NAME("bias_n0.mem")) tb_neuron_0 (.clk(clk), .rst(rst),
+neuron #(.WT_FILE_NAME("../Complete Processor/mem_files/weights_n0.mem"), .BIAS_FILE_NAME("../Complete Processor/mem_files/bias_n0.mem")) tb_neuron_0 (.clk(clk), .rst(rst),
                         .neuron_output(nop0), .output_valid(nop0_valid), .nxt_rd_req(nxt_rd_req0), 
                         .neuron_input(neuron_input_mux),
                         .start_mac((proc_img_mem_full0 && proc_img_mem_full1)));
-neuron #(.WT_FILE_NAME("weights_n1.mem"), .BIAS_FILE_NAME("bias_n1.mem")) tb_neuron_1 (.clk(clk), .rst(rst),
+neuron #(.WT_FILE_NAME("../Complete Processor/mem_files/weights_n1.mem"), .BIAS_FILE_NAME("../Complete Processor/mem_files/bias_n1.mem")) tb_neuron_1 (.clk(clk), .rst(rst),
                         .neuron_output(nop1), .output_valid(nop1_valid), .nxt_rd_req(nxt_rd_req1), 
                         .neuron_input(neuron_input_mux),
                         .start_mac((proc_img_mem_full0 && proc_img_mem_full1)));
-neuron #(.WT_FILE_NAME("weights_n2.mem"), .BIAS_FILE_NAME("bias_n2.mem")) tb_neuron_2 (.clk(clk), .rst(rst),
+neuron #(.WT_FILE_NAME("../Complete Processor/mem_files/weights_n2.mem"), .BIAS_FILE_NAME("../Complete Processor/mem_files/bias_n2.mem")) tb_neuron_2 (.clk(clk), .rst(rst),
                         .neuron_output(nop2), .output_valid(nop2_valid), .nxt_rd_req(nxt_rd_req2), 
                         .neuron_input(neuron_input_mux),
                         .start_mac((proc_img_mem_full0 && proc_img_mem_full1)));
@@ -176,12 +172,12 @@ initial begin
 end
 
 initial begin
-    $readmemb("conv0_expected.mem", exp_conv0);
-    $readmemb("relu0_expected.mem", exp_relu0);
-    $readmemb("pool0_expected.mem", exp_pool0);
-    $readmemb("conv1_expected.mem", exp_conv1);
-    $readmemb("relu1_expected.mem", exp_relu1);
-    $readmemb("pool1_expected.mem", exp_pool1);
+    $readmemb("../Complete Processor/mem_files/conv0_expected.mem", exp_conv0);
+    $readmemb("../Complete Processor/mem_files/relu0_expected.mem", exp_relu0);
+    $readmemb("../Complete Processor/mem_files/pool0_expected.mem", exp_pool0);
+    $readmemb("../Complete Processor/mem_files/conv1_expected.mem", exp_conv1);
+    $readmemb("../Complete Processor/mem_files/relu1_expected.mem", exp_relu1);
+    $readmemb("../Complete Processor/mem_files/pool1_expected.mem", exp_pool1);
     
     conv_idx0 = 0; conv_errors0 = 0; relu_errors0 = 0; pool_errors0 = 0;
     conv_idx1 = 0; conv_errors1 = 0; relu_errors1 = 0; pool_errors1 = 0;
@@ -235,9 +231,9 @@ initial begin
 
     $display("Waiting for neural network classification...");
 
-    $readmemb("neuron0_expected.mem", exp_neu0);
-    $readmemb("neuron1_expected.mem", exp_neu1);
-    $readmemb("neuron2_expected.mem", exp_neu2);
+    $readmemb("../Complete Processor/mem_files/neuron0_expected.mem", exp_neu0);
+    $readmemb("../Complete Processor/mem_files/neuron1_expected.mem", exp_neu1);
+    $readmemb("../Complete Processor/mem_files/neuron2_expected.mem", exp_neu2);
     wait(arg_max_0.score1_valid && arg_max_0.score2_valid && arg_max_0.score3_valid);
     if (nop0 == exp_neu0[0]) $display("Neuron 1 output valid.");
     else $display("Neuron 1 Output is INVALID.");
