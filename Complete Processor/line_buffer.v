@@ -34,22 +34,6 @@ localparam WAIT_FOR_EVENT = 'd0;// Waits till there is trigger for loading D and
 localparam LOAD_ABC= 'd1;//Starting state where rows A, B, C are loaded
 localparam LOAD_D= 'd2;//Row D is loaded as reqd.
 localparam SHIFT_ROWS = 'd3;//Shifting of rows to load new rows into A, B, C rows
-/*
-initial begin
-    row_a_reg = 'd0;
-    row_b_reg = 'd0;
-    row_c_reg = 'd0;
-    row_d_reg = 'd0;
-    row_abc_valid = 'd0;
-    row_d_valid= 'd0;
-    recv_cnt = 'd0;
-    pixel_req = 'd0;
-    rows_rdy = 'd0;
-    row_cnt = 'd0;
-    req_cnt <= 0;
-    win_done_latch = 'd0;
-end
-*/
 
 always @(posedge clk) begin
     if(rst || state == SHIFT_ROWS) win_done_latch <= 'd0;
@@ -83,6 +67,7 @@ always @(posedge clk) begin
         row_d_valid <= 0;
 
         img_done <= 0;
+        win_done_latch <= 'd0;
     end
 
     else begin
@@ -110,8 +95,7 @@ always @(posedge clk) begin
                 else pixel_req <= 0;
 
                 if (pixel_valid && recv_cnt < 48) begin
-                    recv_cnt <= recv_cnt + 1;
-
+                    /*
                     for (i=0; i<15; i=i+1) begin
                         row_a_reg[i*8+:8] <= row_a_reg[(i+1)*8+:8];
                         row_b_reg[i*8+:8] <= row_b_reg[(i+1)*8+:8];
@@ -120,6 +104,18 @@ always @(posedge clk) begin
                     row_a_reg[8*15+:8] <= row_b_reg[0+:8];
                     row_b_reg[8*15+:8] <= row_c_reg[0+:8];
                     row_c_reg[8*15+:8] <= row_in_stream;
+                    */
+                    
+                    recv_cnt <= recv_cnt + 1;
+
+                    if (recv_cnt < 16)
+                        row_a_reg[8*recv_cnt+:8] <= row_in_stream;
+
+                    else if (recv_cnt < 32)
+                        row_b_reg[8*(recv_cnt-16)+:8] <= row_in_stream;
+
+                    else if (recv_cnt < 48)
+                        row_c_reg[8*(recv_cnt-32)+:8] <= row_in_stream;
 
                     if (recv_cnt + 1 == 16*3) begin
                         req_cnt <= 'd0;
@@ -144,15 +140,18 @@ always @(posedge clk) begin
                 else pixel_req <= 0;
 
                 if(pixel_valid && !row_d_valid) begin
-
+                    /*
                     for (i=0; i<15; i=i+1) begin
                         row_d_reg[i*8+:8] <= row_d_reg[(i+1)*8+:8];
                     end
                     row_d_reg[8*15+:8] <= row_in_stream;
-                    
+                    */
                     recv_cnt <= recv_cnt + 1;
 
-                    if (recv_cnt + 1== 16) begin
+                    if (recv_cnt < 16)
+                        row_d_reg[8*recv_cnt+:8] <= row_in_stream;
+
+                    if (recv_cnt + 1 == 16) begin
                         row_d_valid <= 'd1;
                     end
                 end
@@ -175,8 +174,6 @@ always @(posedge clk) begin
 
                 if (row_cnt == 15) img_done <= 'd1;
             end
-
-            default:; //do nothing
             endcase
         end
     end
